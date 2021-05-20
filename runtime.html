@@ -40,7 +40,8 @@
     
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="prev" title="JIT in WeNet" href="jit_in_wenet.html" /> 
+    <link rel="next" title="JIT in WeNet" href="jit_in_wenet.html" />
+    <link rel="prev" title="LM for WeNet" href="lm.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -89,7 +90,7 @@
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="papers.html">Papers</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorial.html">Tutorial</a></li>
-<li class="toctree-l1"><a class="reference internal" href="jit_in_wenet.html">JIT in WeNet</a></li>
+<li class="toctree-l1"><a class="reference internal" href="lm.html">LM for WeNet</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Runtime for WeNet</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#platforms-supported">Platforms Supported</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#architecture-and-implementation">Architecture and Implementation</a><ul>
@@ -101,6 +102,7 @@
 <li class="toctree-l2"><a class="reference internal" href="#references">References</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="jit_in_wenet.html">JIT in WeNet</a></li>
 </ul>
 
             
@@ -207,12 +209,12 @@
 <ul class="simple">
 <li><p>Server</p>
 <ul>
-<li><p><a class="reference external" href="https://github.com/mobvoi/wenet/tree/main/runtime/server/x86">x86</a></p></li>
+<li><p><a class="reference external" href="https://github.com/wenet-e2e/wenet/tree/main/runtime/server/x86">x86</a></p></li>
 </ul>
 </li>
 <li><p>Device</p>
 <ul>
-<li><p><a class="reference external" href="https://github.com/mobvoi/wenet/tree/main/runtime/device/android/wenet">android</a></p></li>
+<li><p><a class="reference external" href="https://github.com/wenet-e2e/wenet/tree/main/runtime/device/android/wenet">android</a></p></li>
 </ul>
 </li>
 </ul>
@@ -229,7 +231,7 @@
 </div>
 <div class="section" id="interface-design">
 <h3>Interface Design<a class="headerlink" href="#interface-design" title="Permalink to this headline">¶</a></h3>
-<p>We use LibTorch to implement U2 runtime in WeNet, and we export several interfaces in PyTorch python code by &#64;torch.jit.export (see <a class="reference external" href="https://github.com/mobvoi/wenet/tree/main/wenet/transformer/asr_model.py">asr_model.py</a>), which are required and used in C++ runtime in <a class="reference external" href="https://github.com/mobvoi/wenet/tree/main/runtime/server/x86/decoder/torch_asr_model.cc">torch_asr_model.cc</a> and <a class="reference external" href="https://github.com/mobvoi/wenet/tree/main/runtime/server/x86/decoder/torch_asr_decoder.cc">torch_asr_decoder.cc</a>. Here we just list the interface and give a brief introduction.</p>
+<p>We use LibTorch to implement U2 runtime in WeNet, and we export several interfaces in PyTorch python code by &#64;torch.jit.export (see <a class="reference external" href="https://github.com/wenet-e2e/wenet/tree/main/wenet/transformer/asr_model.py">asr_model.py</a>), which are required and used in C++ runtime in <a class="reference external" href="https://github.com/wenet-e2e/wenet/tree/main/runtime/server/x86/decoder/torch_asr_model.cc">torch_asr_model.cc</a> and <a class="reference external" href="https://github.com/wenet-e2e/wenet/tree/main/runtime/server/x86/decoder/torch_asr_decoder.cc">torch_asr_decoder.cc</a>. Here we just list the interface and give a brief introduction.</p>
 <table border="1" class="docutils">
 <thead>
 <tr>
@@ -276,7 +278,7 @@
 <li><p>Conformer CNN cache: if conformer is used, we should cache the left context for causal CNN computation in Conformer.</p></li>
 <li><p>Subsampling cache: cache the output of subsampling layer, which is the input of the first encoder layer.</p></li>
 </ul>
-<p>Please see <a class="reference external" href="https://github.com/mobvoi/wenet/tree/main/wenet/transformer/encoder.py">encoder.py:forward_chunk()</a> and <a class="reference external" href="https://github.com/mobvoi/wenet/tree/main/runtime/server/x86/decoder/torch_asr_decoder.cc">torch_asr_decoder.cc</a> for details of the caches.</p>
+<p>Please see <a class="reference external" href="https://github.com/wenet-e2e/wenet/tree/main/wenet/transformer/encoder.py">encoder.py:forward_chunk()</a> and <a class="reference external" href="https://github.com/wenet-e2e/wenet/tree/main/runtime/server/x86/decoder/torch_asr_decoder.cc">torch_asr_decoder.cc</a> for details of the caches.</p>
 <p>In practice, CNN is also used in the subsampling. We should handle the CNN cache in subsampling. However, since there are serveral CNN layers in subsampling with different left contexts, right contexts and strides, which makes it tircky to directly implement the CNN cache in subsampling. In our implementation, we simply overlap the input to avoid subsampling CNN cache. It is simple and straightforward with negligible additional cost since subsampling CNN only costs a very small fraction of the whole computation. The following picture shows how it works, where the blue color is for the overlap part of current inputs and previous inputs.</p>
 <p><img alt="Overlap input for Subsampling CNN" src="_images/subsampling_overalp.gif" /></p>
 </div>
@@ -297,7 +299,8 @@
           </div>
           <footer>
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-        <a href="jit_in_wenet.html" class="btn btn-neutral float-left" title="JIT in WeNet" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="jit_in_wenet.html" class="btn btn-neutral float-right" title="JIT in WeNet" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="lm.html" class="btn btn-neutral float-left" title="LM for WeNet" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
     </div>
 
   <hr/>
